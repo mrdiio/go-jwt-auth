@@ -16,7 +16,13 @@ func NewUserService(userRepo models.UserRepo) models.UserService {
 }
 
 func (s *userService) Create(user *models.User) error {
-	return s.UserRepo.Create(user)
+	err := s.UserRepo.Create(user)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *userService) FindAll() []response.UserResponse {

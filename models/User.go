@@ -1,16 +1,22 @@
 package models
 
 import (
+	"time"
+
+	"github.com/google/uuid"
 	"github.com/mrdiio/go-jwt-auth/response"
-	"gorm.io/gorm"
 )
 
 type User struct {
-	gorm.Model
-	Name     string  `json:"name" gorm:"not null"`
-	Username string  `json:"username" gorm:"unique;not null"`
-	Email    *string `json:"email" gorm:"unique"`
-	Password string  `json:"password" gorm:"not null"`
+	ID               uuid.UUID `json:"id" gorm:"type:uuid;primary_key;default:uuid_generate_v4()"`
+	Name             string    `json:"name" gorm:"not null"`
+	Username         string    `json:"username" gorm:"unique;not null"`
+	Email            *string   `json:"email" gorm:"unique"`
+	Password         string    `json:"password" gorm:"not null"`
+	VerificationCode string    `json:"verification_code"`
+	Verified         bool      `json:"verified" gorm:"not_null;default:false"`
+	CreatedAt        time.Time `json:"created_at"`
+	UpdatedAt        time.Time `json:"updated_at"`
 }
 
 type UserRepo interface {
