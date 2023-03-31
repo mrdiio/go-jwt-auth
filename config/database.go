@@ -1,9 +1,10 @@
 package config
 
 import (
-	"os"
+	"log"
 
 	"github.com/mrdiio/go-jwt-auth/models"
+	"github.com/spf13/viper"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -12,7 +13,7 @@ var DB *gorm.DB
 
 func DatabaseConnection() *gorm.DB {
 	var err error
-	dsn := os.Getenv("DATABASE_URL")
+	dsn := viper.GetString("DATABASE_URL")
 	DB, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if err != nil {
@@ -30,5 +31,6 @@ func CloseDB() {
 	if err != nil {
 		panic("Failed to close database!")
 	}
+	log.Println("Database connection closed")
 	db.Close()
 }

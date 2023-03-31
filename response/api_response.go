@@ -13,12 +13,12 @@ type Response struct {
 	Errors  interface{} `json:"errors,omitempty"`
 }
 
-func Error(ctx *gin.Context, message string, err error) {
-	ctx.AbortWithStatusJSON(http.StatusBadRequest, Response{
-		Message: message,
-		Data:    err.Error(),
-	})
-}
+// func Error(ctx *gin.Context, message string, err error) {
+// 	ctx.AbortWithStatusJSON(http.StatusBadRequest, Response{
+// 		Message: message,
+// 		Errors:  err.Error(),
+// 	})
+// }
 
 func ValidationError(ctx *gin.Context, message string, err error) {
 	var errors []string
@@ -37,7 +37,7 @@ func ValidationError(ctx *gin.Context, message string, err error) {
 		}
 	}
 
-	ctx.AbortWithStatusJSON(http.StatusUnprocessableEntity, Response{
+	ctx.AbortWithStatusJSON(http.StatusBadRequest, Response{
 		Message: message,
 		Errors:  errors,
 	})

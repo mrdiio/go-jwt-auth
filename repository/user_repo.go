@@ -30,3 +30,9 @@ func (r *userRepo) Delete(user *models.User) {
 	result := r.db.Delete(&user)
 	helper.ErrorPanic(result.Error)
 }
+
+func (r *userRepo) FindByEmail(email string) (*models.User, error) {
+	var user models.User
+	result := r.db.Where("email = ?", email).First(&user)
+	return &user, result.Error
+}

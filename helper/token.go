@@ -7,13 +7,13 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-func GenerateToken(ttl time.Duration, payload interface{}, secretJWTKey string) (string, error) {
+func GenerateToken(payload interface{}, e int, secretJwtKey string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"payload": payload,
-		"exp":     time.Now().Add(ttl).Unix(),
+		"exp":     time.Now().Add(time.Second * time.Duration(e)).Unix(),
 	})
 
-	tokenString, err := token.SignedString([]byte(secretJWTKey))
+	tokenString, err := token.SignedString([]byte(secretJwtKey))
 
 	if err != nil {
 		return "", fmt.Errorf("error generating token: %v", err)
@@ -22,22 +22,22 @@ func GenerateToken(ttl time.Duration, payload interface{}, secretJWTKey string) 
 	return tokenString, nil
 }
 
-func VerifyToken(token string, signedJWTKey string) (jwt.MapClaims, error) {
-	t, err := jwt.Parse(token, func(jwtToken *jwt.Token) (interface{}, error) {
-		if _, ok := jwtToken.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", jwtToken.Header["alg"])
+func ValidateToken(requestToken string, secretJwtKey string) (jwt.MapClaims, error) {
+	t, err := jwt.Parse(requestToken, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-
-		return []byte(signedJWTKey), nil
+		return []byte(secretJwtKey), nil
 	})
-
 	if err != nil {
-		return nil, fmt.Errorf("error parsing token: %v", err)
+		return nil, err
 	}
 
-	if claims, ok := t.Claims.(jwt.MapClaims); ok && t.Valid {
-		return claims, nil
+	claims, ok := t.Claims.(jwt.MapClaims)
+	if !ok || !t.Valid {
+		return nil, fmt.Errorf("invalid token")
 	}
 
-	return nil, fmt.Errorf("invalid token")
+	return claims, nil
+
 }

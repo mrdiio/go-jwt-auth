@@ -6,5 +6,5 @@ type UserResponse struct {
 	ID       uuid.UUID `json:"id,omitempty"`
 	Name     string    `json:"name"`
 	Username string    `json:"username"`
-	Email    *string   `json:"email"`
+	Email    string    `json:"email"`
 }

@@ -17,7 +17,6 @@ func AuthRouter(db *gorm.DB, router *gin.RouterGroup) {
 	router.POST("/login", controller.Login)
 
 	authRouter := router.Group("/auth")
-
 	authRouter.POST("/refresh", controller.Refresh)
 	authRouter.POST("/logout", controller.Logout)
 }

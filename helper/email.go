@@ -7,9 +7,9 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"strconv"
 
-	"github.com/mrdiio/go-jwt-auth/models"
+	"github.com/k3a/html2text"
+	"github.com/spf13/viper"
 	"gopkg.in/gomail.v2"
 )
 
@@ -40,18 +40,14 @@ func ParseTemplateDir(dir string) (*template.Template, error) {
 	return template.ParseFiles(paths...)
 }
 
-func SendEmail(user *models.User, email *EmailData) {
-	from := os.Getenv("EMAIL_FROM")
-	smtpHost := os.Getenv("SMTP_HOST")
-	smtpPort := os.Getenv("SMTP_PORT")
-	to := user.Email
-	smtpPass := os.Getenv("SMTP_PASSWORD")
-	smtpUser := os.Getenv("SMTP_USERNAME")
+func SendEmail(email string, emailData *EmailData) {
+	to := email
+	from := viper.GetString("EMAIL_FROM")
 
-	port, err := strconv.Atoi(smtpPort)
-	if err != nil {
-		log.Fatal("Error parsing port: ", err)
-	}
+	smtpHost := viper.GetString("SMTP_PORT")
+	smtpPort := viper.GetInt("SMTP_PORT")
+	smtpPass := viper.GetString("SMTP_PASSWORD")
+	smtpUser := viper.GetString("SMTP_USERNAME")
 
 	var body bytes.Buffer
 	temp, err := ParseTemplateDir("././templates")
@@ -63,12 +59,12 @@ func SendEmail(user *models.User, email *EmailData) {
 
 	m := gomail.NewMessage()
 	m.SetHeader("From", from)
-	m.SetHeader("To", *to)
-	m.SetHeader("Subject", email.Subject)
+	m.SetHeader("To", to)
+	m.SetHeader("Subject", emailData.Subject)
 	m.SetBody("text/html", body.String())
-	// m.AddAlternative("text/plain", html2text.HTML2Text(body.String()))
+	m.AddAlternative("text/plain", html2text.HTML2Text(body.String()))
 
-	d := gomail.NewDialer(smtpHost, port, smtpUser, smtpPass)
+	d := gomail.NewDialer(smtpHost, smtpPort, smtpUser, smtpPass)
 	d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 
 	if err := d.DialAndSend(m); err != nil {

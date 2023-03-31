@@ -8,7 +8,7 @@ import (
 func Setup(db *gorm.DB, gin *gin.Engine) {
 	baseRouter := gin.Group("/api")
 
-	AuthRouter(db, baseRouter)
-
-	UserRouter(db, baseRouter)
+	v1Router := baseRouter.Group("/v1")
+	AuthRouter(db, v1Router)
+	UserRouter(db, v1Router)
 }

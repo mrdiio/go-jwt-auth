@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/mrdiio/go-jwt-auth/models"
 	"github.com/mrdiio/go-jwt-auth/request"
@@ -32,7 +34,9 @@ func (c *UserController) Create(ctx *gin.Context) {
 	}
 
 	if err := c.UserService.Create(&user); err != nil {
-		response.Error(ctx, "Error creating user", err)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, response.Response{
+			Message: "Error creating user",
+		})
 		return
 	}
 
